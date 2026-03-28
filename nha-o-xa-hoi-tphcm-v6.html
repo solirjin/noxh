@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nhà Ở Xã Hội TP.HCM — Tổng Quan 2025–2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1f2937;
+    --border: #2d3748;
+    --accent: #f59e0b;
+    --accent2: #10b981;
+    --accent3: #3b82f6;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Be Vietnam Pro',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.6; }
+
+  /* HEADER */
+  .header {
+    background:linear-gradient(135deg,#0d1117 0%,#1a2332 50%,#0d1117 100%);
+    border-bottom:1px solid var(--border);
+    padding:36px 20px 28px; position:relative; overflow:hidden;
+  }
+  .header::before {
+    content:''; position:absolute; top:-60px; right:-60px;
+    width:300px; height:300px;
+    background:radial-gradient(circle,rgba(245,158,11,.08) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .header-inner { max-width:1400px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+  .header-badge { background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.3); color:var(--accent); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:4px 12px; border-radius:20px; margin-bottom:10px; display:inline-block; }
+  .header h1 { font-family:'Playfair Display',serif; font-size:clamp(22px,4vw,34px); color:#fff; line-height:1.2; margin-bottom:6px; }
+  .header h1 span { color:var(--accent); }
+  .header-sub { color:var(--text-muted); font-size:13px; }
+  .header-stats { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
+  .stat-pill { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; text-align:center; min-width:84px; }
+  .stat-pill .num { font-size:18px; font-weight:800; color:var(--accent); display:block; }
+  .stat-pill .lbl { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; }
+
+  .section-wrap { max-width:1400px; margin:28px auto; padding:0 16px; }
+  .section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ══════════════════════════════════
+     HORIZONTAL JOURNEY SLIDER
+  ══════════════════════════════════ */
+  .journey-wrap { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 24px 20px; }
+
+  /* step pills row */
+  .steps-scroll {
+    overflow-x:auto;
+    overflow-y:visible;
+    padding-bottom:4px;
+    padding-top:10px;
+    scrollbar-width:thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .steps-scroll::-webkit-scrollbar { height:4px; }
+  .steps-scroll::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .steps-row {
+    display:flex;
+    align-items:center;
+    gap:0;
+    min-width:max-content;
+    position:relative;
+    padding:4px 6px;
+  }
+
+  .step-node {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+    cursor:pointer;
+    overflow:visible;
+  }
+
+  /* connector line between nodes */
+  .step-connector {
+    width:32px;
+    height:2px;
+    background:var(--border);
+    flex-shrink:0;
+    margin-top:-22px; /* align with circle center */
+    transition:background .3s;
+  }
+  .step-connector.done { background:var(--accent2); }
+
+  .step-circle {
+    width:44px; height:44px; border-radius:50%;
+    border:2px solid var(--border); background:var(--surface2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:var(--text-dim);
+    transition:all .25s; position:relative; z-index:1;
+    flex-shrink:0;
+  }
+  .step-node.done .step-circle { background:var(--accent2); border-color:var(--accent2); color:#000; font-size:14px; }
+  .step-node.active .step-circle {
+    background:var(--accent); border-color:var(--accent); color:#000;
+    box-shadow:0 0 0 5px rgba(245,158,11,.2);
+  }
+  .step-node.selected .step-circle {
+    border-color:var(--accent3);
+    box-shadow:0 0 0 4px rgba(59,130,246,.15);
+  }
+  .step-node.active.selected .step-circle {
+    box-shadow:0 0 0 5px rgba(245,158,11,.25), 0 0 0 8px rgba(59,130,246,.1);
+  }
+  .step-node:hover .step-circle { transform:translateY(-2px); }
+
+  .step-label {
+    font-size:10px; font-weight:600; color:var(--text-dim);
+    text-align:center; margin-top:6px;
+    width:64px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .step-node.active .step-label { color:var(--accent); }
+  .step-node.done .step-label { color:var(--accent2); }
+  .step-node.selected .step-label { color:var(--accent3) !important; }
+
+  /* current step indicator */
+  .step-node.active .step-circle::after {
+    content:''; position:absolute; inset:-7px; border-radius:50%;
+    border:2px dashed var(--accent);
+    animation:spin 8s linear infinite; opacity:.5;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    margin-top:18px;
+    border-top:1px solid var(--border);
+    padding-top:16px;
+    min-height:80px;
+  }
+  .detail-inner { display:none; animation:fadeIn .2s ease; }
+  .detail-inner.active { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+  .detail-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .detail-stepnum { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; }
+  .detail-title { font-size:16px; font-weight:800; color:#fff; }
+  .detail-badge {
+    font-size:10px; font-weight:600; padding:2px 9px; border-radius:10px; border:1px solid; margin-left:auto; white-space:nowrap;
+  }
+  .badge-active { background:rgba(245,158,11,.12); color:var(--accent); border-color:rgba(245,158,11,.3); }
+  .badge-next { background:rgba(59,130,246,.1); color:var(--accent3); border-color:rgba(59,130,246,.2); }
+  .badge-later { background:rgba(100,116,139,.1); color:var(--text-dim); border-color:rgba(100,116,139,.2); }
+  .badge-goal { background:rgba(16,185,129,.1); color:var(--accent2); border-color:rgba(16,185,129,.25); }
+
+  .detail-desc { font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:10px; }
+
+  .detail-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+  .dtag { font-size:11px; background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); padding:2px 9px; border-radius:8px; }
+  .dtag.warn { background:rgba(245,158,11,.08); border-color:rgba(245,158,11,.2); color:var(--accent); }
+  .dtag.ok { background:rgba(16,185,129,.07); border-color:rgba(16,185,129,.2); color:var(--accent2); }
+
+  /* CHECKLIST (inside step 4) */
+  .checklist-inline { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:4px; }
+  .checklist-inline h4 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--accent3); margin-bottom:10px; }
+  .checklist { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:6px; }
+  .chk { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--surface); border-radius:8px; border:1px solid var(--border); font-size:12px; color:var(--text-muted); cursor:pointer; user-select:none; transition:all .2s; }
+  .chk:hover { border-color:var(--accent3); }
+  .chk.checked { border-color:rgba(16,185,129,.4); background:rgba(16,185,129,.05); color:var(--text); }
+  .chk-box { width:16px; height:16px; border:2px solid var(--border); border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px; transition:all .2s; }
+  .chk.checked .chk-box { background:var(--accent2); border-color:var(--accent2); color:#000; }
+
+  /* nav arrows */
+  .detail-nav { display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .nav-btn {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text-muted);
+    font-size:12px; font-weight:600; padding:6px 14px; border-radius:8px; cursor:pointer;
+    transition:all .2s; font-family:inherit;
+  }
+  .nav-btn:hover { background:var(--surface); border-color:var(--accent3); color:var(--text); }
+  .nav-btn:disabled { opacity:.3; cursor:default; pointer-events:none; }
+  .nav-progress { font-size:12px; color:var(--text-dim); }
+
+  /* you-are-here strip */
+  .you-are-here {
+    background:rgba(245,158,11,.07); border:1px solid rgba(245,158,11,.2);
+    border-radius:10px; padding:11px 15px; margin-top:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .yah-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); flex-shrink:0; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(245,158,11,.4); } 50% { box-shadow:0 0 0 5px rgba(245,158,11,0); } }
+  .you-are-here strong { color:var(--accent); font-size:13px; }
+  .you-are-here span { color:var(--text-dim); font-size:12px; }
+
+  /* ══════════════════════════════════
+     NEXT STEPS
+  ══════════════════════════════════ */
+  .next-box { background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-top:14px; }
+  .next-box h3 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--accent2); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .next-list { display:flex; flex-direction:column; gap:7px; }
+  .next-item { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--surface); border-radius:10px; border:1px solid var(--border); transition:border-color .2s; }
+  .next-item:hover { border-color:var(--accent2); }
+  .next-n { width:21px; height:21px; background:var(--accent2); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; margin-top:1px; }
+  .next-item h4 { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .next-item p { font-size:12px; color:var(--text-muted); line-height:1.4; }
+  .next-tag { display:inline-block; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25); color:var(--accent2); font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; margin-top:4px; }
+
+  /* ══════════════════════════════════
+     PROJECTS
+  ══════════════════════════════════ */
+  .projects-section { max-width:1400px; margin:0 auto 40px; padding:0 16px; }
+  .legend { display:flex; gap:14px; flex-wrap:wrap; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:18px; align-items:center; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); }
+  .legend-dot { width:9px; height:9px; border-radius:50%; }
+
+  .district-block { margin-bottom:8px; }
+  .district-toggle {
+    display:flex; align-items:center; gap:10px; width:100%;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 16px;
+    cursor:pointer; text-align:left; transition:background .2s, border-color .2s;
+    border-left:3px solid var(--accent3); user-select:none;
+  }
+  .district-toggle:hover { background:var(--surface2); border-color:#3d5070; }
+  .district-toggle.open { border-radius:10px 10px 0 0; background:var(--surface2); }
+  .d-name { font-size:14px; font-weight:700; color:var(--text); flex:1; }
+  .d-count { background:rgba(59,130,246,.15); color:var(--accent3); font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; border:1px solid rgba(59,130,246,.2); }
+  .d-statuses { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+  .dsb { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .dsb-open { background:#10b981; }
+  .dsb-const { background:#3b82f6; }
+  .dsb-plan { background:#f59e0b; }
+  .dsb-done { background:#8b5cf6; }
+  .chevron { font-size:11px; color:var(--text-dim); transition:transform .25s; }
+  .district-toggle.open .chevron { transform:rotate(180deg); }
+
+  .district-body { display:none; background:var(--surface2); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:12px 14px; animation:slideDown .2s ease; }
+  .district-body.open { display:block; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+
+  .projects-grid { display:flex; flex-direction:column; gap:8px; }
+  .project-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 17px; transition:border-color .2s, transform .15s; position:relative; overflow:hidden; }
+  .project-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--sc,var(--border)); }
+  .project-card:hover { border-color:#3d4f6b; transform:translateX(2px); }
+  .status-open { --sc:#10b981; }
+  .status-construction { --sc:#3b82f6; }
+  .status-planned { --sc:#f59e0b; }
+  .status-complete { --sc:#8b5cf6; }
+
+  .card-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:9px; }
+  .p-name { font-size:14px; font-weight:700; color:#fff; line-height:1.3; }
+  .p-addr { font-size:12px; color:var(--text-dim); margin-top:2px; }
+  .p-addr a { color:var(--text-dim); text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition:color .2s; }
+  .p-addr a:hover { color:var(--accent3); text-decoration:underline; }
+  .map-addr-link {
+    color: var(--accent3); cursor: pointer; display:inline-flex; align-items:center; gap:4px;
+    transition: color .15s; -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
+  }
+  .map-addr-link:hover { color:#60a5fa; text-decoration:underline; }
+  .status-badge { font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; white-space:nowrap; flex-shrink:0; border:1px solid; }
+  .status-open .status-badge { background:rgba(16,185,129,.15); color:#10b981; border-color:rgba(16,185,129,.3); }
+  .status-construction .status-badge { background:rgba(59,130,246,.15); color:#60a5fa; border-color:rgba(59,130,246,.3); }
+  .status-planned .status-badge { background:rgba(245,158,11,.15); color:#f59e0b; border-color:rgba(245,158,11,.3); }
+  .status-complete .status-badge { background:rgba(139,92,246,.15); color:#a78bfa; border-color:rgba(139,92,246,.3); }
+
+  .card-info { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:9px; }
+  .ic { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:3px 8px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:3px; }
+  .ic .l { color:var(--text-dim); font-size:10px; }
+  .ic strong { color:var(--text); }
+
+  .tl { display:flex; flex-wrap:wrap; background:var(--surface2); border-radius:7px; overflow:hidden; border:1px solid var(--border); }
+  .tli { flex:1; min-width:100px; padding:6px 9px; border-right:1px solid var(--border); }
+  .tli:last-child { border-right:none; }
+  .tli .tl-l { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:1px; }
+  .tli .tl-v { font-size:12px; font-weight:600; color:var(--text); }
+  .tli.hl .tl-v { color:var(--accent); }
+  .tl-v.na { color:var(--text-dim); font-weight:400; font-style:italic; }
+
+  .price-tag { display:inline-flex; align-items:center; gap:3px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); color:var(--accent); font-size:12px; font-weight:700; padding:3px 9px; border-radius:7px; margin-top:7px; }
+
+  .footer { max-width:1400px; margin:0 auto; padding:0 16px 40px; }
+  .disclaimer { background:rgba(239,68,68,.05); border:1px solid rgba(239,68,68,.15); border-radius:10px; padding:13px 16px; font-size:12px; color:var(--text-dim); line-height:1.6; }
+  .disclaimer strong { color:#f87171; }
+
+  /* Map source tabs */
+  .map-source-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 14px 10px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+  .map-source-tabs::-webkit-scrollbar { display: none; }
+  .map-src-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .map-src-btn:hover { border-color: var(--accent3); color: var(--text); }
+  .map-src-btn.active { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+
+  .map-source-note {
+    padding: 7px 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: rgba(59,130,246,.06);
+    border-bottom: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  /* ══════════════════════════════════
+     MAP SECTION
+  ══════════════════════════════════ */
+  .map-section-wrap {
+    max-width: 1400px;
+    margin: 0 auto 32px;
+    padding: 0 16px;
+  }
+  .map-outer {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 8px 40px rgba(0,0,0,.4);
+  }
+  .map-legend-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .map-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .map-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+  }
+  .map-ctrl-hint {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  #projectMap {
+    height: 520px;
+    width: 100%;
+  }
+  .map-tile-credit {
+    padding: 7px 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+  }
+  .map-tile-credit a { color: var(--accent3); text-decoration: none; }
+
+  /* Leaflet popup custom style */
+  .leaflet-popup-content-wrapper {
+    background: #1f2937 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #2d3748 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,.6) !important;
+  }
+  .leaflet-popup-tip { background: #1f2937 !important; }
+  .leaflet-popup-content { margin: 14px 16px !important; }
+  .map-popup-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .map-popup-addr { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+  .map-popup-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .map-popup-chip {
+    font-size: 11px; font-weight: 600; padding: 2px 9px;
+    border-radius: 20px; border: 1px solid;
+  }
+  .chip-open { background: rgba(16,185,129,.15); color: #10b981; border-color: rgba(16,185,129,.3); }
+  .chip-const { background: rgba(59,130,246,.15); color: #60a5fa; border-color: rgba(59,130,246,.3); }
+  .chip-plan { background: rgba(245,158,11,.15); color: #f59e0b; border-color: rgba(245,158,11,.3); }
+  .chip-done { background: rgba(139,92,246,.15); color: #a78bfa; border-color: rgba(139,92,246,.3); }
+  .map-popup-price { margin-top: 7px; font-size: 12px; font-weight: 700; color: #f59e0b; }
+  .leaflet-control-zoom a {
+    background: #1f2937 !important;
+    color: #e2e8f0 !important;
+    border-color: #2d3748 !important;
+  }
+  .leaflet-control-zoom a:hover { background: #2d3748 !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-badge">TP. Hồ Chí Minh</div>
+      <h1>Nhà Ở <span>Xã Hội</span><br>Tổng Quan 2025–2026</h1>
+      <p class="header-sub">Cập nhật tháng 3/2026 · Dữ liệu từ Sở Xây dựng TP.HCM</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill"><span class="num">15+</span><span class="lbl">Dự án</span></div>
+      <div class="stat-pill"><span class="num">~18K</span><span class="lbl">Căn hộ</span></div>
+      <div class="stat-pill"><span class="num">6.6%</span><span class="lbl">Đạt mục tiêu</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNEY -->
+<div class="section-wrap">
+  <div class="section-label">Hành Trình Mua Nhà Ở Xã Hội — 12 Bước</div>
+
+  <div class="journey-wrap">
+
+    <!-- STEP NODES ROW -->
+    <div class="steps-scroll">
+      <div class="steps-row" id="stepsRow">
+        <!-- nodes injected by JS -->
+      </div>
+    </div>
+
+    <!-- YOU ARE HERE -->
+    <div class="you-are-here">
+      <div class="yah-dot"></div>
+      <div><strong>Bạn đang ở Bước 1 / 12</strong> &nbsp;<span>— Nhấn vào từng bước để xem chi tiết</span></div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detailPanel">
+      <!-- injected by JS -->
+    </div>
+
+  </div>
+
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="projects-section">
+  <div class="section-label">Danh Sách Dự Án Theo Quận</div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Đang nhận hồ sơ</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Đang thi công</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Sắp khởi công</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Đang bàn giao</div>
+    <small style="color:var(--text-dim);font-size:11px;margin-left:auto">Click vào quận để mở / đóng</small>
+  </div>
+
+  <!-- Q10 -->
+  <div class="district-block">
+    <button class="district-toggle open" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận 10</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-open"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body open">
+      <div class="projects-grid">
+        <div class="project-card status-open">
+          <div class="card-top">
+            <div><div class="p-name">Nhà Ở Xã Hội Lý Thường Kiệt</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=324+Lý+Thường+Kiệt,+Phường+Diên+Hồng,+Quận+10,+TP.HCM" onclick="openGMap(this)">📍 Số 324 Lý Thường Kiệt, P. Diên Hồng, Q.10</span></div></div>
+            <div class="status-badge">Đang nhận hồ sơ</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Cty CP Đức Mạnh</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>1.025</strong></div>
+            <div class="ic"><span class="l">Căn bán:</span><strong>755</strong></div>
+            <div class="ic"><span class="l">Căn thuê:</span><strong>270</strong></div>
+            <div class="ic"><span class="l">Diện tích:</span><strong>34–77 m²</strong></div>
+            <div class="ic"><span class="l">Tầng:</span><strong>4 khối × 25 tầng</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">10/02/2025</span></div>
+            <div class="tli hl"><span class="tl-l">Nhận hồ sơ</span><span class="tl-v">01/02 – 31/03/2026</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao DK</span><span class="tl-v">~08/2026</span></div>
+            <div class="tli"><span class="tl-l">Website</span><span class="tl-v">ducmanhgroup.com</span></div>
+          </div>
+          <div class="price-tag">~21,6 triệu/m²</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP. Thủ Đức -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">TP. Thủ Đức</span>
+      <span class="d-count">5 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-done"></span><span class="dsb dsb-const"></span><span class="dsb dsb-plan"></span><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-complete">
+          <div class="card-top">
+            <div><div class="p-name">Thủ Thiêm Green House</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Võ+Chí+Công,+Phường+Thạnh+Mỹ+Lợi,+TP.+Thủ+Đức,+TP.HCM" onclick="openGMap(this)">📍 Đường Võ Chí Công, P. Thạnh Mỹ Lợi</span></div></div>
+            <div class="status-badge">Đang bàn giao</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Thủ Thiêm Group</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>1.040</strong></div>
+            <div class="ic"><span class="l">Block:</span><strong>4 block (5–9 tầng)</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">Cuối 2021</span></div>
+            <div class="tli"><span class="tl-l">Block A, D</span><span class="tl-v">BG 07/2024 ✓</span></div>
+            <div class="tli hl"><span class="tl-l">Block B</span><span class="tl-v">07/2025</span></div>
+            <div class="tli hl"><span class="tl-l">Block C</span><span class="tl-v">Q1/2026</span></div>
+          </div>
+          <div class="price-tag">25–30 triệu/m² (720tr – 2 tỷ/căn)</div>
+        </div>
+        <div class="project-card status-construction">
+          <div class="card-top">
+            <div><div class="p-name">Khu Dân Cư Long Trường</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Long+Trường,+TP.+Thủ+Đức,+TP.HCM" onclick="openGMap(this)">📍 Phường Long Trường, TP. Thủ Đức</span></div></div>
+            <div class="status-badge">Đang thi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">Khu vực:</span><strong>Quận 9 cũ – phía Đông TP</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>558 (DK)</strong></div>
+            <div class="ic"><span class="l">Vị trí:</span><strong>Đường Trường Lưu</strong></div>
+            <div class="ic"><span class="l">Kết nối:</span><strong>Vành đai 3, Cao tốc LT–DG</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Dự kiến HT</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Sắp thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2025–2026</span></div>
+            <div class="tli"><span class="tl-l">Giá</span><span class="tl-v na">Đang cập nhật</span></div>
+          </div>
+        </div>
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Khu Nhà Ở P. Phú Hữu</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Phú+Hữu,+TP.+Thủ+Đức,+TP.HCM" onclick="openGMap(this)">📍 Phường Phú Hữu, TP. Thủ Đức</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2026–2027 (DK)</span></div>
+            <div class="tli"><span class="tl-l">Giá</span><span class="tl-v na">Chưa xác định</span></div>
+          </div>
+        </div>
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Khu Nhà Ở P. Trường Thạnh</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Trường+Thạnh,+TP.+Thủ+Đức,+TP.HCM" onclick="openGMap(this)">📍 Phường Trường Thạnh, TP. Thủ Đức</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2026–2027 (DK)</span></div>
+            <div class="tli"><span class="tl-l">Giá</span><span class="tl-v na">Chưa xác định</span></div>
+          </div>
+        </div>
+
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Dragon E-Home</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Đường+990+Nguyễn+Thị+Tư,+Phường+Phú+Hữu,+TP.+Thủ+Đức,+TP.HCM" onclick="openGMap(this)">📍 Đường 990 (Nguyễn Thị Tư), Phường Phú Hữu, TP. Thủ Đức</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Cty CP Địa ốc Phú Long</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>764 căn</strong></div>
+            <div class="ic"><span class="l">Block:</span><strong>5 block × 8 tầng</strong></div>
+            <div class="ic"><span class="l">Loại hình:</span><strong>Studio, 1PN, 2PN, Dual Key</strong></div>
+            <div class="ic"><span class="l">Diện tích:</span><strong>25–77 m²</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Động thổ</span><span class="tl-v">31/08/2026</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">Đang xác định</span></div>
+            <div class="tli"><span class="tl-l">Gần</span><span class="tl-v">Khu Công Nghệ Cao</span></div>
+          </div>
+          <div class="price-tag">~23 triệu/m² (từ 650tr/căn)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận 6</span>
+      <span class="d-count">2 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-const"></span><span class="dsb dsb-done"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-construction">
+          <div class="card-top">
+            <div><div class="p-name">Khu Nhà Ở Chợ Bình Phú Cũ</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+10,+Quận+6,+TP.HCM" onclick="openGMap(this)">📍 Phường 10, Quận 6</span></div></div>
+            <div class="status-badge">Gần hoàn thành</div>
+          </div>
+          <div class="card-info"><div class="ic"><span class="l">Loại hình:</span><strong>Nhà ở XH + Thương mại</strong></div></div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">2023</span></div>
+            <div class="tli hl"><span class="tl-l">Dự kiến HT</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Sắp thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2025–2026</span></div>
+          </div>
+        </div>
+
+        <div class="project-card status-complete">
+          <div class="card-top">
+            <div><div class="p-name">NOXH Western Capital (Lý Chiêu Hoàng)</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=116+Lý+Chiêu+Hoàng,+Phường+10,+Quận+6,+TP.HCM" onclick="openGMap(this)">📍 116 Lý Chiêu Hoàng, P.10, Quận 6</span></div></div>
+            <div class="status-badge">Đã bàn giao</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Hoàng Phúc Land</strong></div>
+            <div class="ic"><span class="l">NOXH:</span><strong>390 căn (2 block A1 &amp; A2)</strong></div>
+            <div class="ic"><span class="l">Vị trí:</span><strong>4 mặt tiền đường trung tâm Q6</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v">2022 ✓</span></div>
+            <div class="tli"><span class="tl-l">Trạng thái</span><span class="tl-v">Đã ở / chuyển nhượng</span></div>
+            <div class="tli"><span class="tl-l">Gần</span><span class="tl-v">Bến xe Miền Tây</span></div>
+            <div class="tli"><span class="tl-l">Giá chuyển nhượng</span><span class="tl-v">~38–40 tr/m²</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận 7</span>
+      <span class="d-count">2 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-const"></span><span class="dsb dsb-const"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-construction">
+          <div class="card-top">
+            <div><div class="p-name">NOXH Khải Vy (Q7 Saigon Riverside Complex)</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=04+Đào+Trí,+Phường+Phú+Thuận,+Quận+7,+TP.HCM" onclick="openGMap(this)">📍 Số 04 Đào Trí, P. Phú Thuận, Quận 7</span></div></div>
+            <div class="status-badge">Đang thi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Cty CP BĐS Khải Thịnh</strong></div>
+            <div class="ic"><span class="l">Tổng thầu:</span><strong>Hưng Thịnh Incons</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>324</strong></div>
+            <div class="ic"><span class="l">Diện tích đất:</span><strong>5.174 m²</strong></div>
+            <div class="ic"><span class="l">Quy mô:</span><strong>21 tầng + 1 hầm</strong></div>
+            <div class="ic"><span class="l">Mỗi tầng:</span><strong>18 căn hộ</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">25/11/2025</span></div>
+            <div class="tli hl"><span class="tl-l">Hoàn thành DK</span><span class="tl-v">Q2/2028</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Vị trí</span><span class="tl-v">Giáp sông SG, gần PMH</span></div>
+          </div>
+          <div class="price-tag">Chưa công bố giá chính thức</div>
+        </div>
+        <div class="project-card status-construction">
+          <div class="card-top">
+            <div><div class="p-name">NOXH MR1 – Eco Green Sài Gòn</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=107+Nguyễn+Văn+Linh,+Phường+Tân+Thuận+Tây,+Quận+7,+TP.HCM" onclick="openGMap(this)">📍 107 Nguyễn Văn Linh, P. Tân Thuận Tây, Q.7</span></div></div>
+            <div class="status-badge">Đang thi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Xuân Mai Sài Gòn</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>712</strong></div>
+            <div class="ic"><span class="l">Diện tích đất:</span><strong>6.994 m²</strong></div>
+            <div class="ic"><span class="l">Thuộc:</span><strong>KDC Tân Thuận Tây (Eco Green)</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">30/08/2022</span></div>
+            <div class="tli hl"><span class="tl-l">Tiến độ</span><span class="tl-v">Đang thi công</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Vị trí</span><span class="tl-v">Cạnh CV Hương Tràm, gần PMH</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bình Thạnh -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận Bình Thạnh</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Nhà Ở XH Số 4 Phan Chu Trinh</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=4+Phan+Chu+Trinh,+Phường+12,+Quận+Bình+Thạnh,+TP.HCM" onclick="openGMap(this)">📍 Số 4 Phan Chu Trinh, P.12, Q. Bình Thạnh</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info"><div class="ic"><span class="l">Vị trí:</span><strong>Gần chợ Bà Chiểu, đường Chu Văn An</strong></div></div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2027 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v na">Đang xác định</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận 12</span>
+      <span class="d-count">3 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-plan"></span><span class="dsb dsb-plan"></span><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Khu Nhà Ở Thu Nhập Thấp Hiệp Thành</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Hiệp+Thành,+Quận+12,+TP.HCM" onclick="openGMap(this)">📍 Phường Hiệp Thành, Quận 12</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2027 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v na">Đang xác định</span></div>
+          </div>
+        </div>
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Nhà Ở XH Lô Số 6 – Tân Thới Nhất</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Tân+Thới+Nhất,+Quận+12,+TP.HCM" onclick="openGMap(this)">📍 Lô 6, Khu tái định 38ha, P. Tân Thới Nhất, Q.12</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2027 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v na">Đang xác định</span></div>
+          </div>
+        </div>
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Lô CT3 & CT7 – Khu TĐC 38ha</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Khu+tái+định+cư+38ha,+Quận+12,+TP.HCM" onclick="openGMap(this)">📍 Khu TĐC 38ha, Quận 12</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">Tổng căn:</span><strong>~1.270</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2026 (DK)</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2028 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Ghi chú</span><span class="tl-v">Trọng điểm kế hoạch 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bình Tân -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Quận Bình Tân</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Chung Cư Lê Thành 2</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Tân+Tạo,+Quận+Bình+Tân,+TP.HCM" onclick="openGMap(this)">📍 Phường Tân Tạo, Quận Bình Tân</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info"><div class="ic"><span class="l">CĐT:</span><strong>Lê Thành</strong></div></div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2027 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v na">Đang xác định</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bình Chánh -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">Huyện Bình Chánh</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Lê Thành Tân Kiên</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Xã+Tân+Kiên,+Huyện+Bình+Chánh,+TP.HCM" onclick="openGMap(this)">📍 Xã Tân Kiên, Huyện Bình Chánh</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Lê Thành</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>~1.400</strong></div>
+            <div class="ic"><span class="l">Diện tích:</span><strong>45–50 m²</strong></div>
+            <div class="ic"><span class="l">Mô hình:</span><strong>Thuê 49 năm</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2025</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">2027 (dự kiến)</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v na">Đang xác định</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P. Rạch Dừa (TP.HCM sau sáp nhập) -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">P. Rạch Dừa (TP.HCM sau sáp nhập)</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-plan"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-planned">
+          <div class="card-top">
+            <div><div class="p-name">Khu NOXH P. Rạch Dừa</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Phường+Rạch+Dừa,+TP.HCM" onclick="openGMap(this)">📍 Phường Rạch Dừa, TP.HCM</span></div></div>
+            <div class="status-badge">Sắp khởi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">Tổng căn:</span><strong>~2.295</strong></div>
+            <div class="ic"><span class="l">Ghi chú:</span><strong>Quy mô lớn, trọng điểm 2026</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli hl"><span class="tl-l">Khởi công</span><span class="tl-v">2026 (DK)</span></div>
+            <div class="tli"><span class="tl-l">Nhận HS</span><span class="tl-v na">Chưa thông báo</span></div>
+            <div class="tli"><span class="tl-l">Bàn giao</span><span class="tl-v na">Đang xác định</span></div>
+            <div class="tli"><span class="tl-l">Quy mô</span><span class="tl-v">Quy mô lớn nhất đợt 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TP. Thủ Dầu Một (Bình Dương – lân cận TP.HCM) -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">TP. Thủ Dầu Một, Bình Dương (lân cận)</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-const"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-construction">
+          <div class="card-top">
+            <div><div class="p-name">K Home New City (NOXH Hòa Phú)</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Đường+D5,+Phường+Hòa+Phú,+Thành+phố+Thủ+Dầu+Một,+Bình+Dương" onclick="openGMap(this)">📍 Đường D5, P. Hòa Phú, TP. Thủ Dầu Một, Bình Dương</span></div></div>
+            <div class="status-badge">Đang thi công</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Kim Oanh Group</strong></div>
+            <div class="ic"><span class="l">Căn hộ NOXH:</span><strong>1.666 căn (6 block × 19 tầng)</strong></div>
+            <div class="ic"><span class="l">Nhà phố NOXH:</span><strong>1.376 căn</strong></div>
+            <div class="ic"><span class="l">Diện tích:</span><strong>25–70 m²</strong></div>
+            <div class="ic"><span class="l">Quy mô đất:</span><strong>~26,7 ha</strong></div>
+            <div class="ic"><span class="l">Giá DK:</span><strong>~20,8 triệu/m²</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">09/03/2025</span></div>
+            <div class="tli hl"><span class="tl-l">Nhà phố BG</span><span class="tl-v">Cuối 2025</span></div>
+            <div class="tli"><span class="tl-l">Căn hộ BG</span><span class="tl-v na">2026–2027 (DK)</span></div>
+            <div class="tli"><span class="tl-l">Lưu ý</span><span class="tl-v">Thuộc Bình Dương, không phải TP.HCM</span></div>
+          </div>
+          <div class="price-tag">~20,8 triệu/m² · Căn hộ từ ~777tr</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P. Chánh Hiệp (Sáp nhập từ Bình Dương) -->
+  <div class="district-block">
+    <button class="district-toggle" onclick="toggleDistrict(this)">
+      <span class="d-name">P. Chánh Hiệp (TP.HCM sau sáp nhập)</span>
+      <span class="d-count">1 dự án</span>
+      <div class="d-statuses"><span class="dsb dsb-done"></span></div>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="district-body">
+      <div class="projects-grid">
+        <div class="project-card status-complete">
+          <div class="card-top">
+            <div><div class="p-name">NOXH An Sinh – Khu ĐT Sinh Thái Chánh Mỹ</div><div class="p-addr"><span class="map-addr-link" data-url="https://www.google.com/maps/search/?api=1&query=Khu+đô+thị+sinh+thái+Chánh+Mỹ,+Phường+Chánh+Hiệp,+TP.HCM" onclick="openGMap(this)">📍 Phường Chánh Hiệp, TP.HCM (trước là P. Chánh Mỹ, Bình Dương)</span></div></div>
+            <div class="status-badge">Đang bàn giao</div>
+          </div>
+          <div class="card-info">
+            <div class="ic"><span class="l">CĐT:</span><strong>Tổng Công ty HUD (Bộ Xây dựng)</strong></div>
+            <div class="ic"><span class="l">Tổng căn:</span><strong>978 căn</strong></div>
+            <div class="ic"><span class="l">Căn bán:</span><strong>810 (648 bán + 162 thuê)</strong></div>
+            <div class="ic"><span class="l">Tòa:</span><strong>6 block × 12 tầng</strong></div>
+            <div class="ic"><span class="l">Diện tích:</span><strong>38–67 m²</strong></div>
+          </div>
+          <div class="tl">
+            <div class="tli"><span class="tl-l">Khởi công</span><span class="tl-v">09/2022</span></div>
+            <div class="tli hl"><span class="tl-l">Bàn giao DK</span><span class="tl-v">Q1/2026</span></div>
+            <div class="tli"><span class="tl-l">Pháp lý</span><span class="tl-v">Đã có GCNQSD đất</span></div>
+            <div class="tli"><span class="tl-l">Website</span><span class="tl-v">noxhchanhmyhud.vn</span></div>
+          </div>
+          <div class="price-tag">~17 triệu/m² (đã gồm VAT)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAP SECTION -->
+<div class="map-section-wrap">
+  <div class="section-label" style="max-width:1400px;margin:0 auto 14px;padding:0 16px;">Bản Đồ Vị Trí Các Dự Án</div>
+  <div class="map-outer">
+    <!-- Source switcher tabs -->
+    <div class="map-source-tabs">
+      <button class="map-src-btn active" onclick="switchMapSource('osm', this)">🗺 OpenStreetMap</button>
+      <button class="map-src-btn" onclick="switchMapSource('goong', this)">🇻🇳 Goong Maps</button>
+      <button class="map-src-btn" onclick="switchMapSource('vietmap', this)">🏙 VietMap</button>
+      <button class="map-src-btn" onclick="switchMapSource('openmap', this)">📍 OpenMap.vn</button>
+    </div>
+    <!-- Status note -->
+    <div class="map-source-note" id="mapSourceNote">
+      Đang dùng OpenStreetMap — bản đồ quốc tế, luôn hoạt động
+    </div>
+    <div class="map-legend-bar">
+      <div class="map-legend-item"><span class="map-dot" style="background:#10b981"></span>Đang nhận hồ sơ</div>
+      <div class="map-legend-item"><span class="map-dot" style="background:#3b82f6"></span>Đang thi công</div>
+      <div class="map-legend-item"><span class="map-dot" style="background:#f59e0b"></span>Sắp khởi công</div>
+      <div class="map-legend-item"><span class="map-dot" style="background:#8b5cf6"></span>Đang bàn giao</div>
+      <div class="map-ctrl-hint">Pinch/Scroll zoom · Kéo di chuyển · Tap marker xem chi tiết</div>
+    </div>
+    <div id="projectMap"></div>
+    <div class="map-tile-credit" id="mapTileCredit">Bản đồ © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="disclaimer">
+    <strong>Lưu ý:</strong> Thông tin tổng hợp từ nguồn công khai đến tháng 3/2026. Mốc thời gian và giá bán có thể thay đổi — xác minh lại với <strong>chủ đầu tư</strong> hoặc <strong>Sở Xây dựng TP.HCM (sxd.hochiminhcity.gov.vn)</strong> trước khi quyết định. Không nộp hồ sơ qua "cò" môi giới, chỉ qua kênh chính thức.
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  {
+    title: "Tìm hiểu thông tin",
+    badge: "active",
+    badgeText: "Bạn đang ở đây",
+    desc: "Tìm hiểu danh sách dự án, mức giá, điều kiện đối tượng, chính sách vay ưu đãi. Xem website Sở Xây dựng TP.HCM và các kênh chính thức của từng chủ đầu tư.",
+    tags: [{ text:"Đang ở bước này", type:"warn" }, { text:"Miễn phí" }, { text:"~1–2 tuần" }]
+  },
+  {
+    title: "Xác nhận điều kiện",
+    badge: "next",
+    badgeText: "Tiếp theo",
+    desc: "Kiểm tra 3 điều kiện cốt lõi: (1) Chưa có nhà/đất tại TP.HCM, (2) Thu nhập thuộc diện được hỗ trợ, (3) Có hộ khẩu TP.HCM hoặc đang làm việc hợp pháp tại đây. Nên hỏi trực tiếp UBND phường hoặc Sở Xây dựng nếu chưa chắc.",
+    tags: [{ text:"Chưa có nhà tại TP.HCM" }, { text:"Thu nhập đủ tiêu chuẩn" }, { text:"Hộ khẩu / KT3" }]
+  },
+  {
+    title: "Chọn dự án",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "So sánh các dự án theo vị trí, giá, diện tích, tiến độ và thời hạn nhận hồ sơ. Ưu tiên dự án đang mở để không bỏ lỡ đợt. Theo dõi thông báo từ Sở Xây dựng và website chủ đầu tư. Bạn có thể nộp hồ sơ ở nhiều dự án cùng lúc để tăng cơ hội.",
+    tags: [{ text:"Lý Thường Kiệt Q.10 nhận HS đến 31/3/2026", type:"warn" }, { text:"Xem bảng dự án phía dưới" }]
+  },
+  {
+    title: "Chuẩn bị hồ sơ",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Chuẩn bị đầy đủ giấy tờ theo yêu cầu của từng dự án. Mỗi chủ đầu tư có thể yêu cầu thêm giấy tờ riêng, nhưng danh sách dưới đây là các giấy tờ phổ biến nhất.",
+    tags: [{ text:"~1–2 tuần chuẩn bị" }, { text:"Xin xác nhận từ UBND phường" }],
+    checklist: true
+  },
+  {
+    title: "Nộp hồ sơ",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Nộp hồ sơ trong thời gian nhận hồ sơ của dự án — trực tiếp tại địa chỉ chủ đầu tư hoặc qua website chính thức. Lấy biên nhận và giữ lại bản sao tất cả giấy tờ đã nộp. Tuyệt đối không nộp qua bên thứ ba hay \"cò\" môi giới.",
+    tags: [{ text:"Chỉ nộp qua kênh chính thức", type:"warn" }, { text:"Giữ biên nhận hồ sơ" }]
+  },
+  {
+    title: "Xét duyệt hồ sơ",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Chủ đầu tư và Sở Xây dựng kiểm tra, xác minh hồ sơ. Thường mất 15–30 ngày. Nếu hồ sơ thiếu hoặc không đủ điều kiện, bạn sẽ được thông báo để bổ sung hoặc nhận lại hồ sơ.",
+    tags: [{ text:"~15–30 ngày" }, { text:"Theo dõi thông báo từ CĐT" }]
+  },
+  {
+    title: "Bốc thăm / Phân suất",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Nếu số hồ sơ hợp lệ nhiều hơn số căn, tổ chức bốc thăm công khai có sự giám sát của Sở Xây dựng. Kết quả được công bố và thông báo đến từng người. Đây là bước may rủi — bạn có thể cải thiện cơ hội bằng cách nộp cho nhiều dự án.",
+    tags: [{ text:"Công khai, có giám sát" }, { text:"Đăng ký nhiều dự án để tăng cơ hội" }]
+  },
+  {
+    title: "Đăng ký vay vốn",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Sau khi trúng suất, liên hệ Ngân hàng Chính sách Xã hội hoặc ngân hàng thương mại được chỉ định để đăng ký gói vay lãi suất ưu đãi. Chuẩn bị thêm bộ hồ sơ vay riêng (xác nhận thu nhập, tài sản đảm bảo nếu có).",
+    tags: [{ text:"Lãi suất ~4.6–4.8%/năm (kiểm tra lại với ngân hàng)" }, { text:"Vay tối đa 25 năm" }]
+  },
+  {
+    title: "Ký hợp đồng",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Ký hợp đồng mua bán chính thức với chủ đầu tư. Đọc kỹ toàn bộ điều khoản — đặc biệt lịch thanh toán, tiến độ bàn giao, điều kiện bảo hành và điều khoản không được chuyển nhượng trong 5 năm. Nên nhờ người am hiểu pháp lý rà soát trước khi ký.",
+    tags: [{ text:"Không được bán lại trong 5 năm đầu", type:"warn" }, { text:"Đọc kỹ trước khi ký" }]
+  },
+  {
+    title: "Thanh toán",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Thanh toán theo từng đợt gắn với tiến độ thi công (thường 5–7 đợt). Phần vay ngân hàng được giải ngân trực tiếp cho chủ đầu tư theo tiến độ. Giữ lại tất cả biên lai và chứng từ thanh toán.",
+    tags: [{ text:"Theo tiến độ thi công" }, { text:"Giữ toàn bộ biên lai" }]
+  },
+  {
+    title: "Nhận bàn giao",
+    badge: "later",
+    badgeText: "Sắp tới",
+    desc: "Kiểm tra căn hộ thực tế trước khi ký biên bản bàn giao: tường, sàn, cửa, điện, nước, thang máy... Ghi nhận và yêu cầu khắc phục mọi lỗi trong thời hạn bảo hành. Không nên ký biên bản khi còn lỗi chưa được sửa.",
+    tags: [{ text:"Kiểm tra kỹ trước khi ký BG" }, { text:"Yêu cầu sửa lỗi trong bảo hành" }]
+  },
+  {
+    title: "Nhận sổ hồng",
+    badge: "goal",
+    badgeText: "Đích đến",
+    desc: "Sau khi thanh toán đủ và hoàn tất thủ tục, chủ đầu tư có trách nhiệm làm Giấy Chứng Nhận (sổ hồng) cho bạn. Theo dõi tiến độ cấp sổ, kiểm tra kỹ thông tin trên sổ khi nhận. Đây là bước hoàn tất quyền sở hữu nhà hợp pháp.",
+    tags: [{ text:"Hoàn tất sở hữu nhà", type:"ok" }, { text:"~3–6 tháng sau bàn giao" }]
+  }
+];
+
+const CHECKLIST_ITEMS = [
+  "CMND / CCCD (bản sao công chứng)",
+  "Sổ hộ khẩu / KT3 (bản sao)",
+  "Giấy đăng ký kết hôn / độc thân",
+  "Xác nhận chưa có nhà đất (UBND phường)",
+  "Xác nhận thu nhập (cơ quan hoặc UBND)",
+  "Đơn đăng ký mua NOXH (mẫu CĐT)",
+  "Tờ khai / quyết toán thuế thu nhập",
+  "Giấy tờ đối tượng ưu tiên (nếu có)"
+];
+
+let selectedStep = 0;
+
+function buildStepsRow() {
+  const row = document.getElementById('stepsRow');
+  row.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    // connector (not before first)
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'step-connector' + (i < 1 ? ' done' : '');
+      row.appendChild(conn);
+    }
+    const node = document.createElement('div');
+    node.className = 'step-node' + (i === 0 ? ' active' : '') + (i === selectedStep ? ' selected' : '');
+    node.innerHTML = `
+      <div class="step-circle">${i < 1 ? '✓' : i + 1}</div>
+      <div class="step-label">${s.title}</div>
+    `;
+    node.onclick = () => selectStep(i);
+    row.appendChild(node);
+  });
+}
+
+function selectStep(idx) {
+  selectedStep = idx;
+  // update node classes
+  document.querySelectorAll('.step-node').forEach((n, i) => {
+    n.classList.toggle('selected', i === idx);
+  });
+  renderDetail(idx);
+  // scroll node into view
+  const nodes = document.querySelectorAll('.step-node');
+  if (nodes[idx]) nodes[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+}
+
+function renderDetail(idx) {
+  const s = STEPS[idx];
+  const panel = document.getElementById('detailPanel');
+
+  const tagsHtml = s.tags.map(t =>
+    `<span class="dtag${t.type ? ' '+t.type : ''}">${t.text}</span>`
+  ).join('');
+
+  const checklistHtml = s.checklist ? `
+    <div class="checklist-inline">
+      <h4>Checklist Hồ Sơ Cần Chuẩn Bị <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-dim)">(click để đánh dấu)</span></h4>
+      <div class="checklist">
+        ${CHECKLIST_ITEMS.map(item => `
+          <div class="chk" onclick="toggleCheck(this)">
+            <div class="chk-box"></div>${item}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const badgeClass = {active:'badge-active', next:'badge-next', later:'badge-later', goal:'badge-goal'}[s.badge];
+
+  panel.innerHTML = `
+    <div class="detail-inner active">
+      <div class="detail-header">
+        <span class="detail-stepnum">Bước ${idx + 1} / ${STEPS.length}</span>
+        <span class="detail-title">${s.title}</span>
+        <span class="detail-badge ${badgeClass}">${s.badgeText}</span>
+      </div>
+      <p class="detail-desc">${s.desc}</p>
+      <div class="detail-tags">${tagsHtml}</div>
+      ${checklistHtml}
+      <div class="detail-nav">
+        <button class="nav-btn" onclick="selectStep(${idx - 1})" ${idx === 0 ? 'disabled' : ''}>← Trước</button>
+        <span class="nav-progress">${idx + 1} / ${STEPS.length}</span>
+        <button class="nav-btn" onclick="selectStep(${idx + 1})" ${idx === STEPS.length - 1 ? 'disabled' : ''}>Tiếp →</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleDistrict(btn) {
+  const body = btn.nextElementSibling;
+  const open = btn.classList.contains('open');
+  btn.classList.toggle('open', !open);
+  body.classList.toggle('open', !open);
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.querySelector('.chk-box').textContent = el.classList.contains('checked') ? '✓' : '';
+}
+
+// init
+buildStepsRow();
+renderDetail(0);
+
+/* ══════════════════════════════════
+   HIGHLIGHT STACK — iPhone notifications
+══════════════════════════════════ */
+/* ══════════════════════════════════
+   LEAFLET MAP
+══════════════════════════════════ */
+/* ══════════════════════════════════
+   LEAFLET MAP — multi-source
+══════════════════════════════════ */
+const MAP_PROJECTS = [
+  {
+    name: "Nhà Ở XH Lý Thường Kiệt",
+    addr: "324 Lý Thường Kiệt, P. Diên Hồng, Q.10",
+    status: "open", statusText: "Đang nhận hồ sơ",
+    price: "~21,6 triệu/m²",
+    detail: "1.025 căn · 4 khối × 25 tầng · HSD đến 31/3/2026",
+    lat: 10.7731, lng: 106.6627
+  },
+  {
+    name: "Thủ Thiêm Green House",
+    addr: "Võ Chí Công, P. Thạnh Mỹ Lợi, TP. Thủ Đức",
+    status: "done", statusText: "Đang bàn giao",
+    price: "25–30 triệu/m²",
+    detail: "1.040 căn · 4 block (5–9 tầng)",
+    lat: 10.7834, lng: 106.7652
+  },
+  {
+    name: "Khu Dân Cư Long Trường",
+    addr: "P. Long Trường, TP. Thủ Đức",
+    status: "const", statusText: "Đang thi công",
+    price: "Đang cập nhật",
+    detail: "558 căn (dự kiến) · Gần Vành đai 3",
+    lat: 10.8012, lng: 106.8100
+  },
+  {
+    name: "Dragon E-Home",
+    addr: "Đường 990 (Nguyễn Thị Tư), P. Phú Hữu, TP. Thủ Đức",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "~23 triệu/m² (từ 650tr/căn)",
+    detail: "764 căn · 5 block × 8 tầng · Gần Khu CNC",
+    lat: 10.8225, lng: 106.7780
+  },
+  {
+    name: "Khu Nhà Ở Chợ Bình Phú Cũ",
+    addr: "P.10, Quận 6",
+    status: "const", statusText: "Gần hoàn thành",
+    price: "Sắp công bố",
+    detail: "NOXH + Thương mại · Dự kiến HT 2025",
+    lat: 10.7498, lng: 106.6348
+  },
+  {
+    name: "NOXH Western Capital",
+    addr: "116 Lý Chiêu Hoàng, P.10, Quận 6",
+    status: "done", statusText: "Đã bàn giao",
+    price: "~38–40 triệu/m² (thứ cấp)",
+    detail: "390 căn (Block A1 & A2) · Bàn giao 2022",
+    lat: 10.7519, lng: 106.6391
+  },
+  {
+    name: "NOXH Khải Vy (Q7 Saigon Riverside)",
+    addr: "04 Đào Trí, P. Phú Thuận, Q.7",
+    status: "const", statusText: "Đang thi công",
+    price: "Chưa công bố",
+    detail: "324 căn · 21 tầng + 1 hầm · Hoàn thành Q2/2028",
+    lat: 10.7208, lng: 106.7350
+  },
+  {
+    name: "NOXH MR1 – Eco Green Sài Gòn",
+    addr: "107 Nguyễn Văn Linh, P. Tân Thuận Tây, Q.7",
+    status: "const", statusText: "Đang thi công",
+    price: "Chưa công bố",
+    detail: "712 căn · 6.994 m² đất · Thuộc KDC Eco Green",
+    lat: 10.7248, lng: 106.7130
+  },
+  {
+    name: "Nhà Ở XH Phan Chu Trinh",
+    addr: "4 Phan Chu Trinh, P.12, Q. Bình Thạnh",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "Gần chợ Bà Chiểu · Dự kiến BG 2027",
+    lat: 10.8098, lng: 106.7077
+  },
+  {
+    name: "Khu NOXH Hiệp Thành",
+    addr: "P. Hiệp Thành, Q.12",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "Dự kiến khởi công 2025 · BG 2027",
+    lat: 10.8620, lng: 106.6480
+  },
+  {
+    name: "Lô CT3 & CT7 – Khu TĐC 38ha Q.12",
+    addr: "Khu TĐC 38ha, Quận 12",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "~1.270 căn · Trọng điểm kế hoạch 2026",
+    lat: 10.8680, lng: 106.6380
+  },
+  {
+    name: "Chung Cư Lê Thành 2",
+    addr: "P. Tân Tạo, Q. Bình Tân",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "CĐT: Lê Thành · Dự kiến BG 2027",
+    lat: 10.7480, lng: 106.5940
+  },
+  {
+    name: "Lê Thành Tân Kiên",
+    addr: "Xã Tân Kiên, H. Bình Chánh",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "~1.400 căn · 45–50 m² · Mô hình thuê 49 năm",
+    lat: 10.6950, lng: 106.5770
+  },
+  {
+    name: "Khu NOXH P. Rạch Dừa",
+    addr: "P. Rạch Dừa, TP.HCM",
+    status: "plan", statusText: "Sắp khởi công",
+    price: "Chưa xác định",
+    detail: "~2.295 căn · Quy mô lớn nhất đợt 2026",
+    lat: 10.6680, lng: 106.6320
+  },
+  {
+    name: "K Home New City (Bình Dương)",
+    addr: "Đường D5, P. Hòa Phú, TP. Thủ Dầu Một",
+    status: "const", statusText: "Đang thi công",
+    price: "~20,8 triệu/m² · từ ~777tr",
+    detail: "1.666 căn hộ + 1.376 nhà phố · ~26,7 ha",
+    lat: 10.9820, lng: 106.6490
+  },
+  {
+    name: "NOXH An Sinh – Chánh Hiệp",
+    addr: "P. Chánh Hiệp, TP.HCM (trước là Chánh Mỹ, BD)",
+    status: "done", statusText: "Đang bàn giao",
+    price: "~17 triệu/m² (gồm VAT)",
+    detail: "978 căn · 6 block × 12 tầng · CĐT: HUD",
+    lat: 11.0150, lng: 106.6510
+  }
+];
+
+const STATUS_COLORS = { open: '#10b981', const: '#3b82f6', plan: '#f59e0b', done: '#8b5cf6' };
+const STATUS_CHIP   = { open: 'chip-open', const: 'chip-const', plan: 'chip-plan', done: 'chip-done' };
+
+// Tile sources config
+const TILE_SOURCES = {
+  osm: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    opts: { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19, subdomains: 'abc' },
+    credit: 'Bản đồ © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+    note: 'Đang dùng OpenStreetMap — bản đồ quốc tế, luôn hoạt động'
+  },
+  goong: {
+    // Goong Maps raster tile (public endpoint, no API key needed for tile preview)
+    url: 'https://tiles.goong.io/assets/goong_map_web.style.json',
+    isVector: true,
+    fallbackUrl: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+    opts: { attribution: '© <a href="https://goong.io" target="_blank">Goong Maps</a> · © OpenStreetMap', maxZoom: 20 },
+    credit: 'Bản đồ © <a href="https://goong.io" target="_blank">Goong Maps</a> · Cần API key để dùng đầy đủ',
+    note: '🇻🇳 Goong Maps — bản đồ Việt Nam. Cần đăng ký API key tại goong.io để load tile đầy đủ'
+  },
+  vietmap: {
+    // VietMap public raster tile
+    url: 'https://maps.vietmap.vn/api/maps/raster/v1/{z}/{x}/{y}.png?apikey=YOUR_KEY',
+    opts: { attribution: '© <a href="https://maps.vietmap.vn" target="_blank">VietMap</a>', maxZoom: 20 },
+    credit: 'Bản đồ © <a href="https://maps.vietmap.vn" target="_blank">VietMap</a> — cần API key',
+    note: '🏙 VietMap — bản đồ Việt Nam chi tiết. Cần API key tại maps.vietmap.vn để hiển thị đầy đủ'
+  },
+  openmap: {
+    // OpenMap.vn — dựa trên OSM với dữ liệu VN
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    opts: { attribution: '© <a href="https://openmap.vn" target="_blank">OpenMap.vn</a> · © OpenStreetMap', maxZoom: 19 },
+    credit: 'Bản đồ © <a href="https://openmap.vn" target="_blank">OpenMap.vn</a> · dữ liệu OSM',
+    note: '📍 OpenMap.vn — bản đồ mở Việt Nam dựa trên OpenStreetMap'
+  }
+};
+
+let leafletMap = null;
+let currentTileLayer = null;
+let markersAdded = false;
+
+function createMarkerIcon(status) {
+  const color = STATUS_COLORS[status] || '#888';
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:24px;height:24px;border-radius:50%;
+      background:${color};
+      border:3px solid rgba(255,255,255,.35);
+      box-shadow:0 2px 10px ${color}99,0 0 0 5px ${color}20;
+    "></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -15]
+  });
+}
+
+function addMarkers() {
+  if (markersAdded || !leafletMap) return;
+  markersAdded = true;
+  MAP_PROJECTS.forEach(p => {
+    const marker = L.marker([p.lat, p.lng], { icon: createMarkerIcon(p.status) });
+    const popupHtml = `
+      <div class="map-popup-name">${p.name}</div>
+      <div class="map-popup-addr">📍 ${p.addr}</div>
+      <div class="map-popup-row">
+        <span class="map-popup-chip ${STATUS_CHIP[p.status]}">${p.statusText}</span>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:7px;line-height:1.5">${p.detail}</div>
+      ${p.price ? `<div class="map-popup-price">💰 ${p.price}</div>` : ''}
+    `;
+    marker.bindPopup(popupHtml, { maxWidth: 260, minWidth: 220 });
+    marker.addTo(leafletMap);
+    marker.on('click', function() { this.openPopup(); });
+  });
+}
+
+function initMap() {
+  leafletMap = L.map('projectMap', {
+    center: [10.78, 106.69],
+    zoom: 11,
+    zoomControl: true,
+    tap: true
+  });
+
+  // Start with OSM — most reliable, no API key
+  const src = TILE_SOURCES.osm;
+  currentTileLayer = L.tileLayer(src.url, src.opts).addTo(leafletMap);
+
+  // Fallback: if OSM tiles fail, try backup
+  currentTileLayer.on('tileerror', function() {
+    console.warn('Tile load error — trying ESRI fallback');
+  });
+
+  addMarkers();
+}
+
+function switchMapSource(key, btn) {
+  // Update tab UI
+  document.querySelectorAll('.map-src-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const src = TILE_SOURCES[key];
+
+  // Update note and credit
+  document.getElementById('mapSourceNote').textContent = src.note;
+  document.getElementById('mapTileCredit').innerHTML = src.credit;
+
+  if (!leafletMap) return;
+
+  // Remove current tile layer
+  if (currentTileLayer) {
+    leafletMap.removeLayer(currentTileLayer);
+    currentTileLayer = null;
+  }
+
+  // For sources needing API key, show overlay and use OSM as visual
+  if (src.isVector || src.url.includes('YOUR_KEY')) {
+    // Show info overlay on map
+    showMapOverlay(key);
+    // Still display OSM underneath so markers remain visible
+    currentTileLayer = L.tileLayer(TILE_SOURCES.osm.url, TILE_SOURCES.osm.opts).addTo(leafletMap);
+  } else {
+    hideMapOverlay();
+    currentTileLayer = L.tileLayer(src.url, src.opts).addTo(leafletMap);
+    // Push tile layer to back so markers stay on top
+    currentTileLayer.bringToBack();
+  }
+}
+
+function showMapOverlay(key) {
+  let overlay = document.getElementById('mapOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'mapOverlay';
+    overlay.style.cssText = `
+      position:absolute;top:0;left:0;right:0;bottom:0;
+      background:rgba(13,17,23,.82);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      z-index:1000;border-radius:0;gap:12px;
+      backdrop-filter:blur(2px);
+    `;
+    document.getElementById('projectMap').style.position = 'relative';
+    document.getElementById('projectMap').appendChild(overlay);
+  }
+
+  const msgs = {
+    goong: {
+      icon: '🇻🇳',
+      title: 'Goong Maps',
+      body: 'Goong Maps là bản đồ Việt Nam chất lượng cao, hỗ trợ tiếng Việt và dữ liệu địa phương chi tiết.',
+      action: 'Đăng ký API key miễn phí tại',
+      link: 'https://goong.io',
+      linkText: 'goong.io'
+    },
+    vietmap: {
+      icon: '🏙',
+      title: 'VietMap',
+      body: 'VietMap cung cấp bản đồ Việt Nam với dữ liệu giao thông, địa danh và POI cập nhật liên tục.',
+      action: 'Đăng ký API key tại',
+      link: 'https://maps.vietmap.vn',
+      linkText: 'maps.vietmap.vn'
+    }
+  };
+
+  const m = msgs[key] || { icon: '📍', title: key, body: 'Cần API key để sử dụng source này.', action: 'Xem tại', link: '#', linkText: key };
+  overlay.innerHTML = `
+    <div style="font-size:40px">${m.icon}</div>
+    <div style="font-size:16px;font-weight:800;color:#fff">${m.title}</div>
+    <div style="font-size:13px;color:#94a3b8;text-align:center;max-width:260px;line-height:1.6">${m.body}</div>
+    <div style="font-size:12px;color:#64748b">${m.action} <a href="${m.link}" target="_blank" style="color:#3b82f6;font-weight:600">${m.linkText}</a></div>
+    <div style="font-size:11px;color:#475569;margin-top:4px">Markers dự án vẫn hiển thị bên dưới với OpenStreetMap</div>
+  `;
+}
+
+function hideMapOverlay() {
+  const overlay = document.getElementById('mapOverlay');
+  if (overlay) overlay.remove();
+}
+
+// Init map after DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMap);
+} else {
+  initMap();
+}
+
+function openGMap(el) {
+  var url = el.getAttribute('data-url');
+  if (!url) return;
+  var a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ if (a.parentNode) a.parentNode.removeChild(a); }, 200);
+}
+</script>
+</body>
+</html>
