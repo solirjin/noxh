@@ -1,70 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#161b22"/>
-      <stop offset="100%" stop-color="#0d1117"/>
-    </linearGradient>
-    <linearGradient id="roof" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#d97706"/>
-    </linearGradient>
-    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#d97706"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#0d1117"/>
 
-  <!-- Rounded square background -->
-  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- House body + roof as one unified amber shape -->
+  <!-- Roof: peak (256,68), eaves at (68,262) and (444,262) -->
+  <!-- Walls: down to y=456 -->
+  <path d="M256,68 L444,262 L404,262 L404,456 L108,456 L108,262 L68,262 Z" fill="#f59e0b"/>
 
-  <!-- Subtle inner border -->
-  <rect x="3" y="3" width="506" height="506" rx="106" fill="none" stroke="#2d3748" stroke-width="2" opacity="0.6"/>
-
-  <!-- Chimney (drawn before roof so roof overlaps it) -->
-  <rect x="318" y="112" width="34" height="100" rx="5" fill="#d97706"/>
-  <!-- Chimney cap -->
-  <rect x="312" y="106" width="46" height="16" rx="4" fill="#f59e0b"/>
-
-  <!-- Roof shadow/depth -->
-  <polygon points="256,72 456,264 56,264" fill="#92400e" opacity="0.4"/>
-
-  <!-- Roof main -->
-  <polygon points="256,72 448,256 64,256" fill="url(#roof)" filter="url(#glow)"/>
-
-  <!-- Roof ridge line -->
-  <line x1="256" y1="72" x2="256" y2="140" stroke="#fde68a" stroke-width="3" opacity="0.5"/>
-
-  <!-- House body -->
-  <rect x="100" y="244" width="312" height="212" fill="url(#body)"/>
-
-  <!-- Left window -->
-  <rect x="124" y="272" width="82" height="68" rx="9" fill="#0d1117"/>
-  <!-- Window glare -->
-  <rect x="128" y="276" width="24" height="14" rx="3" fill="#fde68a" opacity="0.25"/>
-  <!-- Window cross bars -->
-  <line x1="165" y1="272" x2="165" y2="340" stroke="#1a2332" stroke-width="2.5"/>
-  <line x1="124" y1="306" x2="206" y2="306" stroke="#1a2332" stroke-width="2.5"/>
-
-  <!-- Right window -->
-  <rect x="306" y="272" width="82" height="68" rx="9" fill="#0d1117"/>
-  <!-- Window glare -->
-  <rect x="310" y="276" width="24" height="14" rx="3" fill="#fde68a" opacity="0.25"/>
-  <!-- Window cross bars -->
-  <line x1="347" y1="272" x2="347" y2="340" stroke="#1a2332" stroke-width="2.5"/>
-  <line x1="306" y1="306" x2="388" y2="306" stroke="#1a2332" stroke-width="2.5"/>
-
-  <!-- Door (arched top) -->
-  <rect x="210" y="328" width="92" height="128" rx="46" fill="#0d1117"/>
-  <!-- Door knob -->
-  <circle cx="291" cy="398" r="6" fill="#f59e0b" opacity="0.7"/>
-
-  <!-- Ground line / foundation -->
-  <rect x="80" y="455" width="352" height="6" rx="3" fill="#92400e" opacity="0.5"/>
-
-  <!-- Accent star / sparkle (social housing benefit symbol) -->
-  <circle cx="256" cy="164" r="10" fill="#fde68a" opacity="0.6"/>
+  <!-- Door — green accent, arched top, sits at center-bottom of house body -->
+  <rect x="210" y="316" width="92" height="140" rx="46" fill="#10b981"/>
 </svg>
