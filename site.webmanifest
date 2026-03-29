@@ -1,0 +1,18 @@
+{
+  "name": "Nhà Ở Xã Hội TP.HCM",
+  "short_name": "Nhà XH",
+  "description": "Tổng quan dự án nhà ở xã hội TP.HCM 2025–2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
